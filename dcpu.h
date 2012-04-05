@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 
 typedef uint16_t u16;
 typedef uint32_t u32;

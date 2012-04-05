@@ -49,5 +49,8 @@ void dcpu_video_step(struct dcpu *d, struct dcpu_video *v) {
 }
 
 void dcpu_video_stop(struct dcpu_video *v) {
-	endwin();
+	mvprintw(17, 0, "CPU HALTED");
+	move(0, 0);
+	refresh();
+	//endwin();
 }

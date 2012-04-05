@@ -152,6 +152,9 @@ int main(int argc, char **argv) {
 	}
 
 	dcpu_video_stop(&v);
+	while(1) {
+		sleep(1);
+	}
 	return 0;
 }
 
