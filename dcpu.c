@@ -141,15 +141,13 @@ int main(int argc, char **argv) {
 	u16 r = 0;
 
 	memset(&d, 0, sizeof(d));
-	d.sp = 0xffff;
 	dcpu_video_init(&v);
-
 	load(&d, stdin);
 
 	while(r == 0) {
 		r = dcpu_step(&d);
 		dcpu_video_step(&d, &v);
-		usleep(50000);
+		usleep(10000);
 	}
 
 	dcpu_video_stop(&v);
