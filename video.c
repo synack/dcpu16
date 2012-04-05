@@ -17,7 +17,7 @@ void dcpu_video_init(struct dcpu_video *v) {
 	noecho();
 
 	clear();
-	mvprintw(0, 0, "DCPU VIDEO INIT");
+	mvprintw(17, 0, "DCPU VIDEO INIT");
 	refresh();
 }
 
@@ -32,8 +32,8 @@ void dcpu_video_step(struct dcpu *d, struct dcpu_video *v) {
 			c = '.';
 
 		mvaddch(
-			(i % SCREEN_COLS) + 1,
 			(i / SCREEN_COLS) + 1,
+			(i % SCREEN_COLS) + 1,
 			c | A_NORMAL);
 	}
 

@@ -12,8 +12,8 @@
 
 #include "dcpu.h"
 
-#define SCREEN_COLS 12
-#define SCREEN_ROWS 32
+#define SCREEN_COLS 32
+#define SCREEN_ROWS 12
 
 struct dcpu_video {
 	WINDOW *window;
