@@ -4,29 +4,14 @@
 /* DCPU-16 Spec is Copyright 2012 Mojang */
 /* http://0x10c.com/doc/dcpu-16.txt */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <ctype.h>
-
-typedef uint16_t u16;
-typedef uint32_t u32;
-
-struct dcpu {
-	u16 r[8];
-	u16 pc;
-	u16 sp;
-	u16 ov;
-	u16 skip;
-	u16 m[65536];
-};
+#include "dcpu.h"
+#include "video.h"
 
 static u16 lit[0x20] = {
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+    0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 };
 
 u16 *dcpu_opr(struct dcpu *d, u16 code) {
@@ -61,7 +46,7 @@ u16 *dcpu_opr(struct dcpu *d, u16 code) {
 	}
 }
 
-void dcpu_step(struct dcpu *d) {
+u16 dcpu_step(struct dcpu *d) {
 	u16 op = d->m[d->pc++];
 	u16 dst;
 	u32 res;
@@ -77,10 +62,9 @@ void dcpu_step(struct dcpu *d) {
 				d->m[--(d->sp)] = d->pc;
 				d->pc = a;
 			}
-			return;
+			return 0;
 		default:
-			fprintf(stderr, "< ILLEGAL OPCODE >\n");
-			exit(0);
+			return 1;
 		}
 	}
 
@@ -123,33 +107,22 @@ void dcpu_step(struct dcpu *d) {
 
 	if (d->skip) {
 		d->skip = 0;
-		return;
+		return 0;
 	}
 	if (dst < 0x1f) {
 		*aa = res;
 		d->ov = res >> 16;
 	}
-	return;
+	return 0;
 
 cond:
 	if (d->skip) {
 		d->skip = 0;
-		return;
+		return 0;
 	} 
 	d->skip = !res;
-}
 
-void dumpheader(void) {
-	fprintf(stderr,
-		"PC   SP   OV   SKIP A    B    C    X    Y    Z    I    J\n"
-		"---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----\n");
-}
-
-void dumpstate(struct dcpu *d) {
-	fprintf(stderr,
-		"%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
-		d->pc, d->sp, d->ov, d->skip,
-		d->r[0], d->r[1], d->r[2], d->r[3], d->r[4], d->r[5], d->r[6], d->r[7]);
+	return 0;
 }
 
 void load(struct dcpu *d, FILE *fp) {
@@ -160,22 +133,25 @@ void load(struct dcpu *d, FILE *fp) {
 			continue;
 		d->m[n++] = strtoul(buf, 0, 16);
 	}
-	fprintf(stderr,"< LOADED %d WORDS >\n", n);
 }
 	
 int main(int argc, char **argv) {
 	struct dcpu d;
+	struct dcpu_video v;
+	u16 r = 0;
 
 	memset(&d, 0, sizeof(d));
 	d.sp = 0xffff;
+	dcpu_video_init(&v);
 
 	load(&d, stdin);
 
-	dumpheader();
-	for (;;) {
-		dumpstate(&d);
-		dcpu_step(&d);
-	}		
+	while(r == 0) {
+		r = dcpu_step(&d);
+		dcpu_video_step(&d, &v);
+	}
+
+	dcpu_video_stop(&v);
 	return 0;
 }
 
