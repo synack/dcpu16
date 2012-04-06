@@ -17,6 +17,7 @@
 
 struct dcpu_video {
 	WINDOW *window;
+	u16 cursor;
 };
 
 void dcpu_video_init(struct dcpu_video *v);

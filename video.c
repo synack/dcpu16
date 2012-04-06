@@ -14,6 +14,7 @@ void dcpu_video_init(struct dcpu_video *v) {
 
 	v->window = initscr();
 	cbreak();
+	halfdelay(1);
 	noecho();
 
 	clear();
@@ -45,6 +46,11 @@ void dcpu_video_step(struct dcpu *d, struct dcpu_video *v) {
 		d->r[3], d->r[4], d->r[5], d->r[6], d->r[7]);
 
 	move(0, 0);
+	c = getch();
+	if(c != ERR) {
+		d->m[0x9000+(v->cursor % 16)] = c;
+		v->cursor += 2;
+	}
 	refresh();
 }
 
