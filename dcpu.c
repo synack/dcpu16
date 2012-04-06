@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
 	while(r == 0) {
 		r = dcpu_step(&d);
 		dcpu_video_step(&d, &v);
-		usleep(10000);
+		//usleep(1000);
 	}
 
 	dcpu_video_stop(&v);

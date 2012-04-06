@@ -14,7 +14,7 @@ void dcpu_video_init(struct dcpu_video *v) {
 
 	v->window = initscr();
 	cbreak();
-	halfdelay(1);
+	nodelay(v->window, TRUE);
 	noecho();
 
 	clear();
@@ -40,16 +40,16 @@ void dcpu_video_step(struct dcpu *d, struct dcpu_video *v) {
 
 	mvprintw(14, 0, "PC=%04x SP=%04x OV=%04x SKIP=%04x",
 		d->pc, d->sp, d->ov, d->skip);
-	mvprintw(15, 0, "A=%04x  B=%04x  C=%04x",
-		d->r[0], d->r[1], d->r[2]);
-	mvprintw(16, 0, "X=%04x  Y=%04x  Z=%04x I=%04x J=%04x",
-		d->r[3], d->r[4], d->r[5], d->r[6], d->r[7]);
+	mvprintw(15, 0, "A=%04x  B=%04x  C=%04x I=%04x",
+		d->r[0], d->r[1], d->r[2], d->r[6]);
+	mvprintw(16, 0, "X=%04x  Y=%04x  Z=%04x J=%04x",
+		d->r[3], d->r[4], d->r[5], d->r[7]);
 
 	move(0, 0);
 	c = getch();
 	if(c != ERR) {
 		d->m[0x9000+(v->cursor % 16)] = c;
-		v->cursor += 2;
+		v->cursor += 1;
 	}
 	refresh();
 }
